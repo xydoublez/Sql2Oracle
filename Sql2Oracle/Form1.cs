@@ -13,9 +13,11 @@ namespace Sql2Oracle
 {
     public partial class Form1 : Form
     {
+        OracleHelper orcl;
         public Form1()
         {
             InitializeComponent();
+            orcl = new OracleHelper(oracleStr.Text);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -33,24 +35,34 @@ namespace Sql2Oracle
                     SqlDataAdapter ad = new SqlDataAdapter(sqlText.Text, conn);
                     ad.Fill(ds);
                 }
-                OracleHelper orcl = new OracleHelper(oracleStr.Text);
-                var sql = CreateOraTmpSql(ds, tableName.Text);
-                orcl.Query(sql);
+                
+                CreateOraTmpSql(ds, tableName.Text);
+                //orcl.Query(sql);
                 w.Stop();
-            }catch(Exception ex)
+                MessageBox.Show("导入成功！耗时" + w.ElapsedMilliseconds / 1000 + "秒");
+            }
+            catch(Exception ex)
             {
                 MessageBox.Show("导入失败" + ex.Message);
             }
-            MessageBox.Show("导入成功！耗时"+w.ElapsedMilliseconds/1000+"秒");
+            
         }
-        public string CreateOraTmpSql(DataSet his, string tmpName)
+        
+        public void CreateOraTmpSql(DataSet his, string tmpName)
         {
+
+            DataRowCollection rows = his.Tables[0].Rows;
+            var columns = his.Tables[0].Columns;
+
+
+            
+            
             string sql = "declare v_cnt Number; ";
             sql += " BEGIN ";
             sql += " select count(*) into v_cnt from user_tables where table_name = '" + tmpName.ToUpper() + "'; ";
             sql += " if v_cnt=0 then ";
             sql += "execute immediate 'CREATE  TABLE " + tmpName.ToUpper() + "(";
-            var columns = his.Tables[0].Columns;
+
             foreach (DataColumn c in columns)
             {
                 sql += c.ColumnName + " " + DBTypeChange(c.DataType.Name) + ",";
@@ -58,66 +70,110 @@ namespace Sql2Oracle
             sql = sql.TrimEnd(new char[] { ',' });
             sql += ") ';\r\n";
             sql += " end if;";
-
-            DataRowCollection rows = his.Tables[0].Rows;
+            sql += "end;";
+            orcl.ExecuteSql(sql);
+            StringBuilder sb = new StringBuilder();
+            int count = 0;
+            int sum = rows.Count;
+            int number = 1000;
             foreach (DataRow r in rows)
             {
-                sql += "execute immediate 'insert into " + tmpName.ToUpper() + " values(";
-                sql += GetRowValueSql(r, true);
-                sql += ")';\r\n";
+                count++;
+                if (count % number == 0 )
+                {
+
+                    
+                    {
+                        sb.Append("execute immediate 'insert into ").Append(tmpName.ToUpper()).Append(" values(");
+                        sb.Append(GetRowValueSql(r, true));
+                        sb.Append(")';\r\n");
+                    }
+                    var s = "BEGIN \r\n"
+                         + sb.ToString()
+                        + "END;\r\n";
+                    sb.Clear();
+                    System.Diagnostics.Trace.WriteLine(s);
+                    orcl.Query(s);
+
+
+                }
+                else
+                {
+                    if (count == sum)
+                    {
+                        {
+                            sb.Append("execute immediate 'insert into ").Append(tmpName.ToUpper()).Append(" values(");
+                            sb.Append(GetRowValueSql(r, true));
+                            sb.Append(")';\r\n");
+                        }
+                        var s = "BEGIN \r\n"
+                             + sb.ToString()
+                            + "END;\r\n";
+                        sb.Clear();
+                        System.Diagnostics.Trace.WriteLine(s);
+                        orcl.Query(s);
+
+                    }
+                }
+                
+                sb.Append("execute immediate 'insert into ").Append(tmpName.ToUpper()).Append(" values(");
+                sb.Append(GetRowValueSql(r, true));
+                sb.Append(")';\r\n");
+                
             }
-            sql += "END;";
-            return sql;
+            
+            
         }
         private string GetRowValueSql(DataRow row, bool doubleQuote = false)
         {
-            string result = "";
+            StringBuilder result = new StringBuilder();
             var columns = row.Table.Columns;
             foreach (DataColumn c in columns)
             {
+                string val = row[c].ToString();
                 switch (c.DataType.Name.ToLower())
                 {
+                    
                     case "boolean":
                         if (doubleQuote)
                         {
-                            result += (row[c].ToString() == "False" ? "''0''" : "''1''") + ",";
+                            result.Append(val == "False" ? "''0''" : "''1''").Append(",");
                         }
                         else
                         {
-                            result += (row[c].ToString() == "False" ? "'0'" : "'1'") + ",";
+                            result.Append((val == "False" ? "'0'" : "'1'")).Append(",");
                         }
                         break;
                     case "string":
                         if (doubleQuote)
                         {
-                            result += "''" + row[c].ToString() + "''" + ",";
+                            result.Append("''").Append(val.Replace("'", "''''")).Append("'',");
                         }
                         else
                         {
-                            result += "'" + row[c].ToString() + "'" + ",";
+                            result.Append("'").Append(val).Append("',");
                         }
                         break;
                     case "int32":
-                        result += row[c].ToString() + ",";
+                        result.Append(val).Append(",");
                         break;
                     case "decimal":
-                        result += row[c].ToString() + ",";
+                        result.Append(val).Append(",");
                         break;
 
                     default:
                         if (doubleQuote)
                         {
-                            result += "''" + row[c].ToString() + "'',";
+                            result.Append("''").Append(val.Replace("'", "''''")).Append("'',");
                         }
                         else
                         {
-                            result += "'" + row[c].ToString() + "',";
+                            result.Append("'").Append(val).Append("',");
                         }
                         break;
                 }
             }
-            result = result.TrimEnd(new char[] { ',' });
-            return result;
+            return result.ToString().TrimEnd(new char[] { ',' });
         }
         private string DBTypeChange(string str)
         {
@@ -128,7 +184,7 @@ namespace Sql2Oracle
                     outstr = "CHAR(1)";
                     break;
                 case "string":
-                    outstr = "VARCHAR2(2000)";
+                    outstr = "VARCHAR2(4000 CHAR)";
                     break;
                 case "int32":
                     outstr = "NUMBER(10)";
@@ -138,7 +194,7 @@ namespace Sql2Oracle
                     break;
 
                 default:
-                    outstr = "VARCHAR2(4000)";
+                    outstr = "VARCHAR2(4000 CHAR)";
                     break;
             }
 
