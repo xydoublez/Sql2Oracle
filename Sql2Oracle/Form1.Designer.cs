@@ -37,6 +37,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.tableName = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.batchNumber = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // button1
@@ -101,7 +103,7 @@
             // 
             // tableName
             // 
-            this.tableName.Location = new System.Drawing.Point(237, 32);
+            this.tableName.Location = new System.Drawing.Point(170, 36);
             this.tableName.Name = "tableName";
             this.tableName.Size = new System.Drawing.Size(125, 21);
             this.tableName.TabIndex = 6;
@@ -112,17 +114,38 @@
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label3.ForeColor = System.Drawing.Color.Blue;
-            this.label3.Location = new System.Drawing.Point(156, 32);
+            this.label3.Location = new System.Drawing.Point(89, 36);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(60, 24);
             this.label3.TabIndex = 7;
             this.label3.Text = "表名";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label4.ForeColor = System.Drawing.Color.Blue;
+            this.label4.Location = new System.Drawing.Point(298, 32);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(135, 24);
+            this.label4.TabIndex = 9;
+            this.label4.Text = "批处理数量";
+            // 
+            // batchNumber
+            // 
+            this.batchNumber.Location = new System.Drawing.Point(439, 32);
+            this.batchNumber.Name = "batchNumber";
+            this.batchNumber.Size = new System.Drawing.Size(125, 21);
+            this.batchNumber.TabIndex = 8;
+            this.batchNumber.Text = "10000";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(755, 318);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.batchNumber);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.tableName);
             this.Controls.Add(this.label2);
@@ -148,6 +171,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox tableName;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox batchNumber;
     }
 }
 

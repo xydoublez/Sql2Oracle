@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="sqlText.Text" xml:space="preserve">
-    <value>SELECT top 1000 A.ID,A."RequestID" AS REQUEST_NO,B.CUST_ID AS CUSTOMER_ID,A."Submit_user" AS REQUEST_LOGIN_NAME
+    <value>SELECT  A.ID,A."RequestID" AS REQUEST_NO,B.CUST_ID AS CUSTOMER_ID,A."Submit_user" AS REQUEST_LOGIN_NAME
 ,"Submit_time","Title" AS TITLE,"Content" AS CONTENT,A."Submit_Urgency" AS URGENCY ,"Group_ID" AS PROBLEM_TYPE
 ,"Linkman" AS LINKMAN,"Telephone" AS TELEPHONE,C.ID AS PRODUCT_ID,A."ModuleID" AS PRODUCT_MODULE_ID,A."Accept_user" AS ACCEPT_USER_ID
 ,A."Accept_time" AS ACCEPT_DATE,A."need_time" AS ANTI_FINISH_DATE,A."gongshi" AS EXPECT_WORKING_HOURS

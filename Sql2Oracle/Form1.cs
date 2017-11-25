@@ -75,7 +75,7 @@ namespace Sql2Oracle
             StringBuilder sb = new StringBuilder();
             int count = 0;
             int sum = rows.Count;
-            int number = 1000;
+            int number = int.Parse(batchNumber.Text);
             foreach (DataRow r in rows)
             {
                 count++;
