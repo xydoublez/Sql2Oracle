@@ -130,6 +130,7 @@
 FROM COMPANY_CC_Request A
 JOIN t_customer B ON A."customid" = B.CUST_ID_OLD
 JOIN t_product C ON A."ProduceID" = C.PROD_ID
+
 </value>
   </data>
 </root>

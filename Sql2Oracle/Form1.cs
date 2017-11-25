@@ -1,12 +1,15 @@
-﻿using System;
+﻿using ICSharpCode.TextEditor.Document;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Sql2Oracle
@@ -18,14 +21,39 @@ namespace Sql2Oracle
         {
             InitializeComponent();
             orcl = new OracleHelper(oracleStr.Text);
+
+            
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            this.BeginInvoke(new Action(() => {
+                disableAll();
+                import();
+                enableAll();
+
+            }));
+        }
+        private void disableAll()
+        {
+            foreach (Control item in this.Controls)
+            {
+                item.Enabled = false;
+            }
+        }
+        private void enableAll()
+        {
+            foreach (Control item in this.Controls)
+            {
+                item.Enabled = true;
+            }
+        }
+        private void import()
+        {
             Stopwatch w = new Stopwatch();
             try
             {
-              
+
                 w.Start();
                 StringBuilder sb = new StringBuilder();
                 DataSet ds = new DataSet();
@@ -35,19 +63,19 @@ namespace Sql2Oracle
                     SqlDataAdapter ad = new SqlDataAdapter(sqlText.Text, conn);
                     ad.Fill(ds);
                 }
-                
+
                 CreateOraTmpSql(ds, tableName.Text);
                 //orcl.Query(sql);
                 w.Stop();
                 MessageBox.Show("导入成功！耗时" + w.ElapsedMilliseconds / 1000 + "秒");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("导入失败" + ex.Message);
             }
-            
+
         }
-        
+
         public void CreateOraTmpSql(DataSet his, string tmpName)
         {
 
@@ -199,6 +227,14 @@ namespace Sql2Oracle
             }
 
             return outstr;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+          
+
+            //sqlText.Document.HighlightingStrategy = HighlightingStrategyFactory.CreateHighlightingStrategy("SQL");
         }
     }
 }
