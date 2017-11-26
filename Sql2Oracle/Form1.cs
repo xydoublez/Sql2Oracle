@@ -183,10 +183,24 @@ namespace Sql2Oracle
                         }
                         break;
                     case "int32":
-                        result.Append(val).Append(",");
+                        if (val == "")
+                        {
+                            result.Append("-1,");
+                        }
+                        else {
+                            result.Append(val).Append(",");
+                        }
+                        
                         break;
                     case "decimal":
-                        result.Append(val).Append(",");
+                        if (val == "")
+                        {
+                            result.Append("-1,");
+                        }
+                        else
+                        {
+                            result.Append(val).Append(",");
+                        }
                         break;
 
                     default:
