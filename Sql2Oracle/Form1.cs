@@ -101,26 +101,25 @@ namespace Sql2Oracle
             sql += "end;";
             orcl.ExecuteSql(sql);
             StringBuilder sb = new StringBuilder();
-            int count = 0;
+            int count = 1;
             int sum = rows.Count;
             int number = int.Parse(batchNumber.Text);
             foreach (DataRow r in rows)
             {
-                count++;
+                
                 if (count % number == 0 )
                 {
 
-                    
-                    {
-                        sb.Append("execute immediate 'insert into ").Append(tmpName.ToUpper()).Append(" values(");
-                        sb.Append(GetRowValueSql(r, true));
-                        sb.Append(")';\r\n");
-                    }
+
+                    sb.Append("execute immediate 'insert into ").Append(tmpName.ToUpper()).Append(" values(");
+                    sb.Append(GetRowValueSql(r, true));
+                    sb.Append(")';\r\n");
                     var s = "BEGIN \r\n"
                          + sb.ToString()
                         + "END;\r\n";
                     sb.Clear();
                     System.Diagnostics.Trace.WriteLine(s);
+                    System.Diagnostics.Trace.WriteLine("批处理执行");
                     orcl.Query(s);
 
 
@@ -129,25 +128,27 @@ namespace Sql2Oracle
                 {
                     if (count == sum)
                     {
-                        {
-                            sb.Append("execute immediate 'insert into ").Append(tmpName.ToUpper()).Append(" values(");
-                            sb.Append(GetRowValueSql(r, true));
-                            sb.Append(")';\r\n");
-                        }
+
+                        sb.Append("execute immediate 'insert into ").Append(tmpName.ToUpper()).Append(" values(");
+                        sb.Append(GetRowValueSql(r, true));
+                        sb.Append(")';\r\n");
                         var s = "BEGIN \r\n"
                              + sb.ToString()
                             + "END;\r\n";
                         sb.Clear();
                         System.Diagnostics.Trace.WriteLine(s);
+                        System.Diagnostics.Trace.WriteLine("批处理执行");
                         orcl.Query(s);
 
                     }
+                    sb.Append("execute immediate 'insert into ").Append(tmpName.ToUpper()).Append(" values(");
+                    sb.Append(GetRowValueSql(r, true));
+                    sb.Append(")';\r\n");
                 }
-                
-                sb.Append("execute immediate 'insert into ").Append(tmpName.ToUpper()).Append(" values(");
-                sb.Append(GetRowValueSql(r, true));
-                sb.Append(")';\r\n");
-                
+                count++;
+
+
+
             }
             
             
