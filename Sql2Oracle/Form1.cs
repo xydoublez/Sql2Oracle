@@ -159,7 +159,7 @@ namespace Sql2Oracle
             var columns = row.Table.Columns;
             foreach (DataColumn c in columns)
             {
-                string val = row[c].ToString();
+                string val = row[c].ToString().Replace("\0","");
                 switch (c.DataType.Name.ToLower())
                 {
                     
