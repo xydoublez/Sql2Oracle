@@ -48,9 +48,11 @@ namespace Sql2Oracle
                 item.Enabled = true;
             }
         }
+        int totalCount = 0;
         private void import()
         {
             Stopwatch w = new Stopwatch();
+            totalCount = 0;
             try
             {
 
@@ -67,7 +69,7 @@ namespace Sql2Oracle
                 CreateOraTmpSql(ds, tableName.Text);
                 //orcl.Query(sql);
                 w.Stop();
-                MessageBox.Show("导入成功！耗时" + w.ElapsedMilliseconds / 1000 + "秒");
+                MessageBox.Show("导入"+ totalCount + "条成功！耗时" + w.ElapsedMilliseconds / 1000 + "秒");
             }
             catch (Exception ex)
             {
@@ -103,6 +105,8 @@ namespace Sql2Oracle
             StringBuilder sb = new StringBuilder();
             int count = 1;
             int sum = rows.Count;
+            totalCount = sum;
+            System.Diagnostics.Trace.WriteLine("total:" + sum);
             int number = int.Parse(batchNumber.Text);
             foreach (DataRow r in rows)
             {
@@ -160,6 +164,14 @@ namespace Sql2Oracle
             foreach (DataColumn c in columns)
             {
                 string val = row[c].ToString().Replace("\0","");
+                if (val.Length > 2000) {
+                    int byteLength = Encoding.GetEncoding("gb18030").GetBytes(val).Length;
+                    if (byteLength > 4000)
+                    {
+                        val = val.Substring(0, val.Length-(byteLength-4000)*2);
+                    }
+                }
+              
                 switch (c.DataType.Name.ToLower())
                 {
                     

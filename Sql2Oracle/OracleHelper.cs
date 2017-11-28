@@ -297,8 +297,8 @@ namespace Sql2Oracle
 				}
 				catch(OracleException ex)
 				{
-                    System.Diagnostics.Trace.WriteLine("出错SQL:" + SQLString);
-					throw new Exception(ex.Message + "SQL:" + SQLString);
+                    
+					throw new Exception(ex.Message);
 				}			
 				return ds;
 			}			
