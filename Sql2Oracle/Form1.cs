@@ -20,13 +20,14 @@ namespace Sql2Oracle
         public Form1()
         {
             InitializeComponent();
-            orcl = new OracleHelper(oracleStr.Text);
+            
 
             
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            orcl = new OracleHelper(oracleStr.Text);
             this.BeginInvoke(new Action(() => {
                 disableAll();
                 if (chkClob.Checked)
@@ -316,7 +317,7 @@ namespace Sql2Oracle
                     sb.Clear();
                     System.Diagnostics.Trace.WriteLine(s);
                     System.Diagnostics.Trace.WriteLine("批处理执行");
-                    orcl.ExecuteSql(s);
+                    orcl.Query(s);
 
 
                 }
