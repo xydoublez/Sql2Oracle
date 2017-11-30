@@ -39,6 +39,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.batchNumber = new System.Windows.Forms.TextBox();
             this.sqlText = new ICSharpCode.TextEditor.TextEditorControlEx();
+            this.label5 = new System.Windows.Forms.Label();
+            this.chkClob = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -143,11 +145,36 @@
             this.sqlText.TabIndex = 10;
             this.sqlText.Text = resources.GetString("sqlText.Text");
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label5.ForeColor = System.Drawing.Color.Red;
+            this.label5.Location = new System.Drawing.Point(29, 73);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(475, 24);
+            this.label5.TabIndex = 11;
+            this.label5.Text = "注意：超长字段，请再字段名后追加_CLOB";
+            // 
+            // chkClob
+            // 
+            this.chkClob.AutoSize = true;
+            this.chkClob.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.chkClob.ForeColor = System.Drawing.Color.Blue;
+            this.chkClob.Location = new System.Drawing.Point(511, 80);
+            this.chkClob.Name = "chkClob";
+            this.chkClob.Size = new System.Drawing.Size(97, 20);
+            this.chkClob.TabIndex = 12;
+            this.chkClob.Text = "CLOB模式";
+            this.chkClob.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(848, 509);
+            this.Controls.Add(this.chkClob);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.sqlText);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.batchNumber);
@@ -159,6 +186,7 @@
             this.Controls.Add(this.sqlConnStr);
             this.Controls.Add(this.button1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Sql2Oracle";
@@ -180,6 +208,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox batchNumber;
         private ICSharpCode.TextEditor.TextEditorControlEx sqlText;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.CheckBox chkClob;
     }
 }
 
