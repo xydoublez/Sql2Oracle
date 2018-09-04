@@ -113,17 +113,10 @@ namespace Sql2Oracle
 			{				
 				using (OracleCommand cmd = new OracleCommand(SQLString,connection))
 				{
-					try
-					{		
 						connection.Open();
-						int rows=cmd.ExecuteNonQuery();
-						return rows;
-					}
-					catch(OracleException E)
-					{					
-						connection.Close();
-						throw new Exception(E.Message);
-					}
+						cmd.ExecuteNonQuery();
+						return 0;
+					 
 				}				
 			}
 		}
@@ -291,8 +284,9 @@ namespace Sql2Oracle
 				DataSet ds = new DataSet();
 				try
 				{
+                    
 					connection.Open();
-					OracleDataAdapter command = new OracleDataAdapter(SQLString,connection);				
+					OracleDataAdapter command = new OracleDataAdapter(SQLString,connection);	
 					command.Fill(ds,"ds");
 				}
 				catch(OracleException ex)

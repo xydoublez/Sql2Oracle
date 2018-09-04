@@ -27,6 +27,31 @@ namespace Sql2Oracle
 
         private void button1_Click(object sender, EventArgs e)
         {
+            //Thread t = new Thread(run);
+            //t.IsBackground = true;
+            //t.Start();
+            rbResult.Clear();
+            log("……开始……");
+            orcl = new OracleHelper(oracleStr.Text);
+            this.BeginInvoke(new Action(() => {
+                disableAll();
+                if (chkClob.Checked)
+                {
+                    import();
+
+                }
+                else
+                {
+                    import2();
+                }
+
+                
+
+            }));
+        }
+        private void run(Object s)
+        {
+            rbResult.Clear();
             orcl = new OracleHelper(oracleStr.Text);
             this.BeginInvoke(new Action(() => {
                 disableAll();
@@ -87,9 +112,10 @@ namespace Sql2Oracle
             }
 
         }
+        Stopwatch w;
         private void import2()
         {
-            Stopwatch w = new Stopwatch();
+            w = new Stopwatch();
             totalCount = 0;
             try
             {
@@ -106,12 +132,12 @@ namespace Sql2Oracle
 
                 CreateOraTmpSql2(ds, tableName.Text);
                 //orcl.Query(sql);
-                w.Stop();
-                MessageBox.Show("导入" + totalCount + "条成功！耗时" + w.ElapsedMilliseconds / 1000 + "秒");
+                
             }
             catch (Exception ex)
             {
                 MessageBox.Show("导入失败" + ex.Message);
+                enableAll();
             }
 
         }
@@ -145,6 +171,7 @@ namespace Sql2Oracle
             totalCount = sum;
             System.Diagnostics.Trace.WriteLine("total:" + sum);
             int number = int.Parse(batchNumber.Text);
+            List<string> sqlList = new List<string>();
             foreach (DataRow r in rows)
             {
 
@@ -159,9 +186,10 @@ namespace Sql2Oracle
                          + sb.ToString()
                         + "END;\r\n";
                     sb.Clear();
-                    System.Diagnostics.Trace.WriteLine(s);
-                    System.Diagnostics.Trace.WriteLine("批处理执行");
-                    orcl.Query(s);
+                    //System.Diagnostics.Trace.WriteLine(s);
+                    //System.Diagnostics.Trace.WriteLine("批处理执行");
+                    //orcl.Query(s);
+                    sqlList.Add(s);
 
 
                 }
@@ -177,9 +205,10 @@ namespace Sql2Oracle
                              + sb.ToString()
                             + "END;\r\n";
                         sb.Clear();
-                        System.Diagnostics.Trace.WriteLine(s);
-                        System.Diagnostics.Trace.WriteLine("批处理执行");
-                        orcl.Query(s);
+                        //System.Diagnostics.Trace.WriteLine(s);
+                        //System.Diagnostics.Trace.WriteLine("批处理执行");
+                        //orcl.Query(s);
+                        sqlList.Add(s);
 
                     }
                     sb.Append("execute immediate 'insert into ").Append(tmpName.ToUpper()).Append(" values(");
@@ -191,8 +220,49 @@ namespace Sql2Oracle
 
 
             }
+          
+            excuteBatchThread(sqlList);
+        }
+        private void excuteBatchThread(List<string> sqlList)
+        {
+            int count = sqlList.Count;
+            int max = 4;
+            int.TryParse(txtThreadCount.Text, out max);
+            ThreadPool.SetMinThreads(4, 4);
+            ThreadPool.SetMaxThreads(max, max);
+            foreach (var sql in sqlList)
+            {
+                ThreadPool.QueueUserWorkItem(new WaitCallback(runSql), sql);
+            }
+            enableAll();
+            log("多线程排队完成");
+        }
+        public  void runSql(object sql)
+        {
+            log("多线程执行语句开始");
+            try
+            {
+                orcl.ExecuteSql((string)sql);
+                
+                log("多线程执行语句完成");
+                
+            }
+            catch(Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine(ex.Message + ex.StackTrace);
+                log(ex.Message + ex.StackTrace);
+            }
+            
 
-
+        }
+        private void log(string msg)
+        {
+            this.BeginInvoke(new Action(() =>
+            {
+                rbResult.AppendText(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "\r\n" + msg + "\r\n");
+                rbResult.ScrollToCaret();
+            }));
+            
         }
         private string GetRowValueSql2(DataRow row, bool doubleQuote = false)
         {
@@ -455,10 +525,18 @@ namespace Sql2Oracle
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            //int max = 4;
+            //int.TryParse(txtThreadCount.Text, out max);
+            //ThreadPool.SetMinThreads(max, max);
+            //ThreadPool.SetMaxThreads(max, max);
 
-          
 
             //sqlText.Document.HighlightingStrategy = HighlightingStrategyFactory.CreateHighlightingStrategy("SQL");
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            rbResult.Clear();
         }
     }
 }

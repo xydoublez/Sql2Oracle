@@ -41,6 +41,10 @@
             this.sqlText = new ICSharpCode.TextEditor.TextEditorControlEx();
             this.label5 = new System.Windows.Forms.Label();
             this.chkClob = new System.Windows.Forms.CheckBox();
+            this.rbResult = new System.Windows.Forms.RichTextBox();
+            this.button2 = new System.Windows.Forms.Button();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txtThreadCount = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // button1
@@ -59,8 +63,8 @@
             this.sqlConnStr.Name = "sqlConnStr";
             this.sqlConnStr.Size = new System.Drawing.Size(552, 21);
             this.sqlConnStr.TabIndex = 2;
-            this.sqlConnStr.Text = "Data Source=10.68.4.17;Initial Catalog=eom;Persist Security Info=True;User ID=sa;" +
-    "Password=wobuguan@msun789";
+            this.sqlConnStr.Text = "Data Source=10.68.4.31;Initial Catalog=comm;Persist Security Info=True;User ID=sa" +
+    ";Password=Sfx371482";
             // 
             // oracleStr
             // 
@@ -68,9 +72,7 @@
             this.oracleStr.Name = "oracleStr";
             this.oracleStr.Size = new System.Drawing.Size(552, 21);
             this.oracleStr.TabIndex = 3;
-            this.oracleStr.Text = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.68.4.68)(P" +
-    "ORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SID=ORCL)));User Id=MsunErpUser;Pass" +
-    "word=msunsoft123;";
+            this.oracleStr.Text = resources.GetString("oracleStr.Text");
             // 
             // label1
             // 
@@ -97,18 +99,18 @@
             // 
             // tableName
             // 
-            this.tableName.Location = new System.Drawing.Point(170, 36);
+            this.tableName.Location = new System.Drawing.Point(93, 36);
             this.tableName.Name = "tableName";
             this.tableName.Size = new System.Drawing.Size(125, 21);
             this.tableName.TabIndex = 6;
-            this.tableName.Text = "sfxlzq";
+            this.tableName.Text = "out_pats";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label3.ForeColor = System.Drawing.Color.Blue;
-            this.label3.Location = new System.Drawing.Point(89, 33);
+            this.label3.Location = new System.Drawing.Point(12, 33);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(60, 24);
             this.label3.TabIndex = 7;
@@ -119,7 +121,7 @@
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label4.ForeColor = System.Drawing.Color.Blue;
-            this.label4.Location = new System.Drawing.Point(298, 29);
+            this.label4.Location = new System.Drawing.Point(221, 29);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(135, 24);
             this.label4.TabIndex = 9;
@@ -127,7 +129,7 @@
             // 
             // batchNumber
             // 
-            this.batchNumber.Location = new System.Drawing.Point(439, 32);
+            this.batchNumber.Location = new System.Drawing.Point(362, 32);
             this.batchNumber.Name = "batchNumber";
             this.batchNumber.Size = new System.Drawing.Size(125, 21);
             this.batchNumber.TabIndex = 8;
@@ -143,7 +145,7 @@
             this.sqlText.Size = new System.Drawing.Size(824, 397);
             this.sqlText.SyntaxHighlighting = "SQL";
             this.sqlText.TabIndex = 10;
-            this.sqlText.Text = resources.GetString("sqlText.Text");
+            this.sqlText.Text = "select * from comm.dict.out_pats";
             // 
             // label5
             // 
@@ -168,11 +170,53 @@
             this.chkClob.Text = "CLOB模式";
             this.chkClob.UseVisualStyleBackColor = true;
             // 
+            // rbResult
+            // 
+            this.rbResult.Location = new System.Drawing.Point(894, 59);
+            this.rbResult.Name = "rbResult";
+            this.rbResult.ReadOnly = true;
+            this.rbResult.Size = new System.Drawing.Size(202, 418);
+            this.rbResult.TabIndex = 13;
+            this.rbResult.Text = "";
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(929, 4);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 53);
+            this.button2.TabIndex = 14;
+            this.button2.Text = "清除日志";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label6.ForeColor = System.Drawing.Color.Blue;
+            this.label6.Location = new System.Drawing.Point(504, 29);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(135, 24);
+            this.label6.TabIndex = 16;
+            this.label6.Text = "最大线程数";
+            // 
+            // txtThreadCount
+            // 
+            this.txtThreadCount.Location = new System.Drawing.Point(660, 35);
+            this.txtThreadCount.Name = "txtThreadCount";
+            this.txtThreadCount.Size = new System.Drawing.Size(58, 21);
+            this.txtThreadCount.TabIndex = 15;
+            this.txtThreadCount.Text = "100";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(848, 509);
+            this.ClientSize = new System.Drawing.Size(1140, 509);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.txtThreadCount);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.rbResult);
             this.Controls.Add(this.chkClob);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.sqlText);
@@ -210,6 +254,10 @@
         private ICSharpCode.TextEditor.TextEditorControlEx sqlText;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.CheckBox chkClob;
+        private System.Windows.Forms.RichTextBox rbResult;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox txtThreadCount;
     }
 }
 

@@ -117,21 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="sqlText.Text" xml:space="preserve">
-    <value>SELECT  A.ID,A."RequestID" AS REQUEST_NO,B.CUST_ID AS CUSTOMER_ID,A."Submit_user" AS REQUEST_LOGIN_NAME
-,"Submit_time","Title" AS TITLE,"Content" AS CONTENT,A."Submit_Urgency" AS URGENCY ,"Group_ID" AS PROBLEM_TYPE
-,"Linkman" AS LINKMAN,"Telephone" AS TELEPHONE,C.ID AS PRODUCT_ID,A."ModuleID" AS PRODUCT_MODULE_ID,A."Accept_user" AS ACCEPT_USER_ID
-,A."Accept_time" AS ACCEPT_DATE,A."need_time" AS ANTI_FINISH_DATE,A."gongshi" AS EXPECT_WORKING_HOURS
-,A."Problem_Class" AS PROBLEM_CLASS,A."AssignedlScore" AS ASSIGNEDL_SCORE
-,A."Return_Content" AS RETURN_REASON
-,A."version" AS VERSION_ID,A."sgongshi" AS ACTUAL_WORKING_HOURS,A."Actual_time" AS ACTUAL_FINISH_DATE
-,A."result2" AS RESULT_IN,A."result1" AS RESULT_OUT,A."ProcessSpeed" AS PROCESS_SPEED,A."Custom_Judge" AS QUALITY
-,A."no_reason" AS NO_CHECK_REASON,A."Status" AS STATUS ,0 AS FLAG_INVALID
-FROM COMPANY_CC_Request A
-JOIN t_customer B ON A."customid" = B.CUST_ID_OLD
-JOIN t_product C ON A."ProduceID" = C.PROD_ID
-
-</value>
+  <data name="oracleStr.Text" xml:space="preserve">
+    <value>Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.68.4.140)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name=comm)));User Id=sfx;Password=371482;Max Pool Size=512;Pooling=true;Connection Timeout=60;</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
