@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using Oracle.ManagedDataAccess.Client;
 using System.Text;
 using Oracle.ManagedDataAccess.Types;
-namespace Sql2Oracle
+namespace SfxOracle
 {
 	/// <summary>
     /// 数据访问基础类(基于Oracle) 

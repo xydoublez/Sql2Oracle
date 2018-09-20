@@ -1,13 +1,8 @@
-﻿using ICSharpCode.TextEditor.Document;
-    using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -27,6 +22,9 @@ namespace Sql2Oracle
 
         private void button1_Click(object sender, EventArgs e)
         {
+
+            //bulkCopy(tableName.Text);
+            //return;
             //Thread t = new Thread(run);
             //t.IsBackground = true;
             //t.Start();
@@ -179,6 +177,94 @@ namespace Sql2Oracle
                 {
 
 
+                    sb.Append("execute immediate 'insert /*+ append parallel(a, 4) nologging */ into ").Append(tmpName.ToUpper()).Append(" values(");
+                    sb.Append(GetRowValueSql2(r, true));
+                    sb.Append(")';\r\n");
+                    var s = "BEGIN \r\n"
+                         + sb.ToString()
+                        + "END;\r\n";
+                    sb.Clear();
+                    //System.Diagnostics.Trace.WriteLine(s);
+                    //System.Diagnostics.Trace.WriteLine("批处理执行");
+                    //orcl.Query(s);
+                    sqlList.Add(s);
+
+
+                }
+                else
+                {
+                    if (count == sum)
+                    {
+
+                        sb.Append("execute immediate 'insert /*+ append parallel(a, 4) nologging */ into ").Append(tmpName.ToUpper()).Append(" values(");
+                        sb.Append(GetRowValueSql2(r, true));
+                        sb.Append(")';\r\n");
+                        var s = "BEGIN \r\n"
+                             + sb.ToString()
+                            + "END;\r\n";
+                        sb.Clear();
+                        //System.Diagnostics.Trace.WriteLine(s);
+                        //System.Diagnostics.Trace.WriteLine("批处理执行");
+                        //orcl.Query(s);
+                        sqlList.Add(s);
+
+                    }
+                    sb.Append("execute immediate 'insert /*+ append parallel(a, 4) nologging */ into ").Append(tmpName.ToUpper()).Append(" values(");
+                    sb.Append(GetRowValueSql2(r, true));
+                    sb.Append(")';\r\n");
+                }
+                count++;
+
+
+
+            }
+          
+            excuteBatchThread(sqlList);
+        }
+        /// <summary>
+        /// 绑定数组
+        /// 
+        /// </summary>
+        /// <param name="his"></param>
+        /// <param name="tmpName"></param>
+        public void CreateOraTmpSql3(DataSet his, string tmpName)
+        {
+
+            DataRowCollection rows = his.Tables[0].Rows;
+            var columns = his.Tables[0].Columns;
+
+
+
+
+            string sql = "declare v_cnt Number; ";
+            sql += " BEGIN ";
+            sql += " select count(*) into v_cnt from user_tables where table_name = '" + tmpName.ToUpper() + "'; ";
+            sql += " if v_cnt=0 then ";
+            sql += "execute immediate 'CREATE  TABLE " + tmpName.ToUpper() + "(";
+
+            foreach (DataColumn c in columns)
+            {
+                sql += c.ColumnName + " " + DBTypeChange(c) + ",";
+            }
+            sql = sql.TrimEnd(new char[] { ',' });
+            sql += ") ';\r\n";
+            sql += " end if;";
+            sql += "end;";
+            orcl.ExecuteSql(sql);
+            StringBuilder sb = new StringBuilder();
+            int count = 1;
+            int sum = rows.Count;
+            totalCount = sum;
+            System.Diagnostics.Trace.WriteLine("total:" + sum);
+            int number = int.Parse(batchNumber.Text);
+            List<string> sqlList = new List<string>();
+            foreach (DataRow r in rows)
+            {
+
+                if (count % number == 0)
+                {
+
+
                     sb.Append("execute immediate 'insert into ").Append(tmpName.ToUpper()).Append(" values(");
                     sb.Append(GetRowValueSql2(r, true));
                     sb.Append(")';\r\n");
@@ -198,7 +284,7 @@ namespace Sql2Oracle
                     if (count == sum)
                     {
 
-                        sb.Append("execute immediate 'insert into ").Append(tmpName.ToUpper()).Append(" values(");
+                        sb.Append("execute immediate 'insert /*+ append */ into ").Append(tmpName.ToUpper()).Append(" values(");
                         sb.Append(GetRowValueSql2(r, true));
                         sb.Append(")';\r\n");
                         var s = "BEGIN \r\n"
@@ -220,7 +306,7 @@ namespace Sql2Oracle
 
 
             }
-          
+
             excuteBatchThread(sqlList);
         }
         private void excuteBatchThread(List<string> sqlList)
@@ -538,5 +624,48 @@ namespace Sql2Oracle
         {
             rbResult.Clear();
         }
+        #region 批量插入数据
+        /// <summary>
+        /// 批量插入数据
+        /// </summary>
+        /// <param name="dt">要插入的数据</param>
+        /// <param name="targetTable">数据库中的表</param>
+        public  void bulkCopy(string targetTable)
+        {
+
+            //DataSet ds = new DataSet();
+            //using (SqlConnection conn = new SqlConnection(sqlConnStr.Text))
+            //{
+            //    conn.Open();
+            //    SqlDataAdapter ad = new SqlDataAdapter(sqlText.Text, conn);
+            //    ad.Fill(ds);
+            //    var dt = ds.Tables[0];
+            //    using (OracleBulkCopy bulkCopy = new OracleBulkCopy(oracleStr.Text, OracleBulkCopyOptions.UseInternalTransaction))
+            //    {
+
+            //        bulkCopy.BatchSize = 100000;
+            //        bulkCopy.BulkCopyTimeout = 260;
+            //        bulkCopy.DestinationTableName = targetTable;    //服务器上目标表的名称
+            //        bulkCopy.BatchSize = dt.Rows.Count;   //每一批次中的行数
+            //        if (dt != null && dt.Rows.Count != 0)
+            //        {
+            //            bulkCopy.WriteToServer(dt);   //将提供的数据源中的所有行复制到目标表中
+            //        }
+            //    }
+            //}
+          
+
+
+
+        }
+        #endregion
+
+
+
+
+
+
+
+
     }
 }
