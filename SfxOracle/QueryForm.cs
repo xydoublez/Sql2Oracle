@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -71,6 +72,15 @@ namespace SfxOracle
                 {
                     res.AppendLine("归档模式：没有开启");
                 }
+                if (isTraceOn())
+                {
+
+                    res.AppendLine("监听日志跟踪：开启（判定依据为跟踪日志有今天的数据）");
+                }
+                else
+                {
+                    res.AppendLine("监听日志跟踪：关闭 （判定依据为跟踪日志有今天的数据）");
+                }
                 res.AppendLine(GetNls());
                 res.AppendLine("==================================================================");
                 //1主要参数
@@ -91,7 +101,7 @@ namespace SfxOracle
                 this.tabControl1.SelectedIndex = 1;
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message + ex.StackTrace);
             }
@@ -111,12 +121,12 @@ namespace SfxOracle
         }
         private string GetNls()
         {
-            
+
             DataSet ds = orcl.Query(@"select parameter, value from nls_database_parameters where parameter = 'NLS_CHARACTERSET'");
             var dt = ds.Tables[0];
             var result = "字符集：" + dt.Rows[0][1].ToString();
             return result;
-           
+
         }
         private string queryParamter()
         {
@@ -245,5 +255,66 @@ ORDER BY
             }
             return result;
         }
+
+        private bool isTraceOn()
+        {
+            bool suc = false;
+            try
+            {
+                //0创建表
+                string traceDir = getBase() + "\\diag\\tnslsnr\\" + getHostName() + "\\listener\\trace";
+                if(!File.Exists(traceDir+ "\\listener.log"))
+                {
+                    return false;
+                }
+                orcl.ExecuteSql(@"BEGIN
+
+    EXECUTE IMMEDIATE 'create or replace directory sfxdirtrace as ''" + traceDir + @"''' ;
+            EXECUTE IMMEDIATE 'create  table sfxdirtrace
+           (log varchar2(2000))
+ organization external
+ (type oracle_loader
+  default directory sfxdirtrace
+  access parameters
+
+ (records delimited by newline  CHARACTERSET ZHS16GBK)
+ location(''listener.log''))
+ reject limit unlimited
+' ; 
+
+    END; ");
+                //1查询数据
+
+                DataSet ds = orcl.Query(@"select count(*) from sfxdirtrace where log like '' ||  to_char(sysdate,'DD-MON-RRRR') || '%'");
+                if (ds.Tables[0].Rows[0][0].ToString() != "0")
+                {
+                    suc = true;
+                }
+                else
+                {
+                    suc = false;
+                }
+                //2最后删除表
+                orcl.ExecuteSql("drop table sfxdirtrace");
+                return suc;
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.StackTrace);
+                return true;
+            }
+        }
+        private string getHostName()
+        {
+
+            DataSet ds = orcl.Query(@"select host_name from v$instance");
+            return ds.Tables[0].Rows[0][0].ToString();
+        }
+        private string getBase()
+        {
+
+            DataSet ds = orcl.Query(@"select value from v$diag_info  where name='ADR Base'");
+            return ds.Tables[0].Rows[0][0].ToString();
+        }
     }
+
 }
