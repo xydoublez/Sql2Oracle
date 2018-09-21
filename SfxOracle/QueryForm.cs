@@ -29,7 +29,7 @@ namespace SfxOracle
             try
             {
 
-                orcl = new OracleHelper(string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;Connection Timeout=600;",
+                orcl = new OracleHelper(string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;",
                     txtIp.Text, txtPort.Text, txtServiceName.Text, txtUserId.Text, txtPassword.Text));
                 DataSet ds = orcl.Query(this.sqlText.Text);
                 this.dataGridView1.DataSource = ds.Tables[0];
@@ -67,7 +67,7 @@ namespace SfxOracle
         private string GetVerifyInfo(string ip,string port,string serviceName,string userId,string password,string hospitalName,string module="")
         {
             
-                orcl = new OracleHelper(string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;Connection Timeout=600;",
+                orcl = new OracleHelper(string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;",
                  ip,port,serviceName,userId,password));
                 StringBuilder res = new StringBuilder();
                 failCount = 0;
