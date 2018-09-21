@@ -46,16 +46,26 @@
             this.sqlText = new ICSharpCode.TextEditor.TextEditorControlEx();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.rbResult = new System.Windows.Forms.RichTextBox();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.button2 = new System.Windows.Forms.Button();
+            this.dataGridView2 = new System.Windows.Forms.DataGridView();
+            this.lblxlsInfo = new System.Windows.Forms.Label();
             this.验证 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.rbBatchResult = new System.Windows.Forms.RichTextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.tabPage2.SuspendLayout();
+            this.tabPage3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(904, 4);
+            this.button1.Location = new System.Drawing.Point(886, -3);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(133, 55);
             this.button1.TabIndex = 14;
@@ -163,6 +173,7 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Location = new System.Drawing.Point(33, 60);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -193,7 +204,6 @@
             // 
             // sqlText
             // 
-             
             this.sqlText.Font = new System.Drawing.Font("Courier New", 10F);
             this.sqlText.Location = new System.Drawing.Point(19, 6);
             this.sqlText.Name = "sqlText";
@@ -225,9 +235,53 @@
             this.rbResult.TabIndex = 0;
             this.rbResult.Text = "";
             // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.rbBatchResult);
+            this.tabPage3.Controls.Add(this.button2);
+            this.tabPage3.Controls.Add(this.dataGridView2);
+            this.tabPage3.Controls.Add(this.lblxlsInfo);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(1139, 485);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "批量验证结果";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(1000, 6);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(133, 40);
+            this.button2.TabIndex = 27;
+            this.button2.Text = "导出";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click_1);
+            // 
+            // dataGridView2
+            // 
+            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView2.Location = new System.Drawing.Point(50, 52);
+            this.dataGridView2.Name = "dataGridView2";
+            this.dataGridView2.RowTemplate.Height = 23;
+            this.dataGridView2.Size = new System.Drawing.Size(824, 416);
+            this.dataGridView2.TabIndex = 1;
+            // 
+            // lblxlsInfo
+            // 
+            this.lblxlsInfo.AutoSize = true;
+            this.lblxlsInfo.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lblxlsInfo.ForeColor = System.Drawing.Color.Blue;
+            this.lblxlsInfo.Location = new System.Drawing.Point(66, 23);
+            this.lblxlsInfo.Name = "lblxlsInfo";
+            this.lblxlsInfo.Size = new System.Drawing.Size(142, 14);
+            this.lblxlsInfo.TabIndex = 0;
+            this.lblxlsInfo.Text = "批量数据文件信息：";
+            // 
             // 验证
             // 
-            this.验证.Location = new System.Drawing.Point(1066, 4);
+            this.验证.Location = new System.Drawing.Point(1047, -1);
             this.验证.Name = "验证";
             this.验证.Size = new System.Drawing.Size(133, 55);
             this.验证.TabIndex = 26;
@@ -235,11 +289,35 @@
             this.验证.UseVisualStyleBackColor = true;
             this.验证.Click += new System.EventHandler(this.验证_Click);
             // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(1186, 105);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(92, 55);
+            this.button3.TabIndex = 28;
+            this.button3.Text = "批量验证";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            this.openFileDialog1.Filter = "EXCEL文件|*.xls;*.xlsx";
+            // 
+            // rbBatchResult
+            // 
+            this.rbBatchResult.Location = new System.Drawing.Point(922, 64);
+            this.rbBatchResult.Name = "rbBatchResult";
+            this.rbBatchResult.Size = new System.Drawing.Size(168, 376);
+            this.rbBatchResult.TabIndex = 28;
+            this.rbBatchResult.Text = "";
+            // 
             // QueryForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1281, 580);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.验证);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.label5);
@@ -260,6 +338,9 @@
             this.tabPage1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.tabPage2.ResumeLayout(false);
+            this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -284,5 +365,13 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.RichTextBox rbResult;
         private System.Windows.Forms.Button 验证;
+        private System.Windows.Forms.Button button3;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.Label lblxlsInfo;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.DataGridView dataGridView2;
+        private System.Windows.Forms.RichTextBox rbBatchResult;
     }
 }

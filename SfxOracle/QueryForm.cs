@@ -1,4 +1,5 @@
-﻿using Oracle.ManagedDataAccess.Client;
+﻿using ExcelDataReader;
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -52,15 +53,25 @@ namespace SfxOracle
 
         private void 验证_Click(object sender, EventArgs e)
         {
-            verify();
-        }
-        private void verify()
-        {
             try
             {
+                this.rbResult.Text = GetVerifyInfo(txtIp.Text, txtPort.Text, txtServiceName.Text, txtUserId.Text, txtPassword.Text, "");
+                this.tabControl1.SelectedIndex = 1;
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.StackTrace);
+            }
+        }
+        //验证失败数
+        int failCount = 0;
+        private string GetVerifyInfo(string ip,string port,string serviceName,string userId,string password,string hospitalName,string module="")
+        {
+            
                 orcl = new OracleHelper(string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;Connection Timeout=600;",
-                 txtIp.Text, txtPort.Text, txtServiceName.Text, txtUserId.Text, txtPassword.Text));
+                 ip,port,serviceName,userId,password));
                 StringBuilder res = new StringBuilder();
+                failCount = 0;
+
                 //0验证是否归档模式
                 res.AppendLine("==================================================================");
                 res.AppendLine("0.参数：");
@@ -71,17 +82,22 @@ namespace SfxOracle
                 else
                 {
                     res.AppendLine("归档模式：没有开启");
+                    failCount += 1;
                 }
                 if (isTraceOn())
                 {
 
                     res.AppendLine("监听日志跟踪：开启（判定依据为跟踪日志有今天的数据）");
+                    failCount += 1;
                 }
                 else
                 {
                     res.AppendLine("监听日志跟踪：关闭 （判定依据为跟踪日志有今天的数据）");
                 }
                 res.AppendLine(GetNls());
+                res.AppendLine("==================================================================");
+                res.AppendLine("==================================================================");
+                res.AppendLine("==================================================================");
                 res.AppendLine("==================================================================");
                 //1主要参数
                 res.AppendLine(queryParamter());
@@ -97,14 +113,13 @@ namespace SfxOracle
                 res.AppendLine("==================================================================");
                 res.AppendLine(queryDataFile());
                 res.AppendLine("==================================================================");
-                this.rbResult.Text = res.ToString();
-                this.tabControl1.SelectedIndex = 1;
+                if (failCount > 0)
+                {
+                    res.AppendLine("SFXERROR:" + failCount);
+                }
+                return res.ToString();
 
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + ex.StackTrace);
-            }
+           
 
         }
         private bool IsArchive()
@@ -148,6 +163,10 @@ where name in ('processes','sga_max_size','spfile','memory_target','memory_max_t
             DataSet ds = orcl.Query(@"SELECT NAME, VALUE FROM V$RMAN_CONFIGURATION");
             var dt = ds.Tables[0];
             var result = "2.RMAN配置参数：\r\n";
+            if (dt.Rows.Count == 0)
+            {
+                failCount += 1;
+            }
             foreach (DataRow row in dt.Rows)
             {
                 result += "参数名：" + row["NAME"].ToString() + "\r\n";
@@ -241,6 +260,10 @@ and A.START_TIME >= sysdate-7 and A.start_time <= sysdate
 ORDER BY
 	A .COMPLETION_TIME DESC");
             var dt = ds.Tables[0];
+            if (dt.Rows.Count == 0)
+            {
+                failCount += 1;
+            }
             var result = "4.RMAN一周内备份集相关信息：\r\n";
             foreach (DataRow row in dt.Rows)
             {
@@ -263,10 +286,6 @@ ORDER BY
             {
                 //0创建表
                 string traceDir = getBase() + "\\diag\\tnslsnr\\" + getHostName() + "\\listener\\trace";
-                if(!File.Exists(traceDir+ "\\listener.log"))
-                {
-                    return false;
-                }
                 orcl.ExecuteSql(@"BEGIN
 
     EXECUTE IMMEDIATE 'create or replace directory sfxdirtrace as ''" + traceDir + @"''' ;
@@ -314,6 +333,193 @@ ORDER BY
 
             DataSet ds = orcl.Query(@"select value from v$diag_info  where name='ADR Base'");
             return ds.Tables[0].Rows[0][0].ToString();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+        }
+        //批量数据表格路径
+        string xlsFile = "";
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Application.DoEvents();
+            this.Invoke(new Action(() => {
+                this.openFileDialog1.Title = "请选择批量验证的EXCEL表格";
+                if (this.openFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    xlsFile = this.openFileDialog1.FileName;
+                    lblxlsInfo.Text += xlsFile;
+                    this.tabControl1.SelectedIndex = 2;
+                    try
+                    {
+                        batchVerify();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message + ex.StackTrace);
+                    }
+                }
+            }));
+         
+        }
+        private void batchVerify()
+        {
+            DataSet ds = getBatchInfo();
+            AddBatchLog("开始验证");
+            var table = ds.Tables[0];
+            int i = 0;
+            DataTable dt = new DataTable();
+            dt.Columns.Add(new DataColumn("医院名称"));
+            dt.Columns.Add(new DataColumn("服务器"));
+            dt.Columns.Add(new DataColumn("IP"));
+            dt.Columns.Add(new DataColumn("服务名"));
+            dt.Columns.Add(new DataColumn("验证内容"));
+            dt.Columns.Add(new DataColumn("是否验证通过"));
+            foreach (DataRow item in table.Rows)
+            {
+                i++;
+                if (i == 1)
+                {
+                    continue;
+                }
+                
+                var hospitalName = item[0].ToString();
+                var module = item[1].ToString();
+                var ip = item[2].ToString();
+                var userId = item[3].ToString();
+                var password = item[4].ToString();
+                var serviceName = item[5].ToString();
+                string result = "";
+                try
+                {
+                    result = GetVerifyInfo(ip, "1521", serviceName, userId, password, hospitalName);
+                    AddBatchLog(hospitalName + "-" + module + "验证完成");
+                }
+                catch(Exception ex)
+                {
+                    result = "SFXERROR:"+ ex.Message + ex.StackTrace;
+                    AddBatchLog(result);
+                }
+                DataRow row = dt.NewRow();
+                row["医院名称"] = hospitalName;
+                row["服务器"] = module;
+                row["IP"] = ip;
+                row["服务名"] = serviceName;
+                row["验证内容"] = result;
+                row["是否验证通过"] = result.IndexOf("SFXERROR:")>-1 ? "否" : "是";
+                dt.Rows.Add(row);
+
+            }
+            this.dataGridView2.DataSource = dt;
+            this.dataGridView2.Refresh();
+            AddBatchLog("验证结束");
+            MessageBox.Show("验证结束");
+        }
+        private DataSet getBatchInfo()
+        {
+            using (var stream = File.Open(xlsFile, FileMode.Open, FileAccess.Read))
+            {
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    return  reader.AsDataSet();
+                    
+                }
+            }
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            try
+            {
+                explort();
+                MessageBox.Show("导出成功!");
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.StackTrace);
+            }
+        }
+        private void explort()
+        {
+            SaveFileDialog sflg = new SaveFileDialog();
+            sflg.Filter = "Excel(*.xls)|*.xls|Excel(*.xlsx)|*.xlsx";
+            if (sflg.ShowDialog() == System.Windows.Forms.DialogResult.Cancel)
+            {
+                return;
+            }
+            //this.gridView1.ExportToXls(sflg.FileName);
+            //NPOI.xs book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+            NPOI.SS.UserModel.IWorkbook book = null;
+            if (sflg.FilterIndex == 1)
+            {
+                book = new NPOI.HSSF.UserModel.HSSFWorkbook();
+            }
+            else
+            {
+                book = new NPOI.XSSF.UserModel.XSSFWorkbook();
+            }
+
+            NPOI.SS.UserModel.ISheet sheet = book.CreateSheet("test_001");
+
+            // 添加表头
+            NPOI.SS.UserModel.IRow row = sheet.CreateRow(0);
+            int index = 0;
+            foreach (DataGridViewColumn item in this.dataGridView2.Columns)
+            {
+                if (item.Visible)
+                {
+                    NPOI.SS.UserModel.ICell cell = row.CreateCell(index);
+                    cell.SetCellType(NPOI.SS.UserModel.CellType.String);
+                    cell.SetCellValue(item.HeaderText);
+                    index++;
+                }
+            }
+
+            // 添加数据
+
+            for (int i = 0; i < this.dataGridView2.Rows.Count; i++)
+            {
+                index = 0;
+                row = sheet.CreateRow(i + 1);
+                foreach (DataGridViewColumn item in this.dataGridView2.Columns)
+                {
+                    if (item.Visible)
+                    {
+                        if (dataGridView2.Rows[i].Cells[item.HeaderText].Value != null)
+                        {
+                            NPOI.SS.UserModel.ICell cell = row.CreateCell(index);
+                            cell.SetCellType(NPOI.SS.UserModel.CellType.String);
+                            cell.SetCellValue(dataGridView2.Rows[i].Cells[item.HeaderText].Value.ToString().Trim());
+                        }
+                        index++;
+                    }
+                }
+            }
+            // 写入 
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+            book.Write(ms);
+            book = null;
+
+            using (FileStream fs = new FileStream(sflg.FileName, FileMode.Create, FileAccess.Write))
+            {
+                byte[] data = ms.ToArray();
+                fs.Write(data, 0, data.Length);
+                fs.Flush();
+            }
+
+            ms.Close();
+            ms.Dispose();
+        }
+        private void AddBatchLog(string msg)
+        {  
+            Application.DoEvents();
+            this.rbBatchResult.BeginInvoke(new Action(() => {
+                var info = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "\r\n";
+                info += msg + "\r\n";
+                this.rbBatchResult.AppendText(info);
+                File.AppendAllText("log.txt", info);
+                this.rbBatchResult.ScrollToCaret();
+            }));
         }
     }
 

@@ -259,3 +259,6 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/SfxOracle/oracle用户数据信息.xlsx
+/SfxOracle/测试.xls
+/SfxOracle/验证结果.xls
