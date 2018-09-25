@@ -51,13 +51,13 @@ namespace SfxOracle
         }
         public string GetVerifyInfo(string ip, string port, string serviceName, string userId, string password, string hospitalName, string module = "")
         {
-            var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;Connection Timeout=6;",
-                 ip, port, serviceName, userId, password);
-            //if (cb_sysdba.Checked)
-            //{
-            //    connstr += "DBA Privilege=SYSDBA;";
-            //}
-            orcl = new OracleHelper(connstr);
+            //var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;Connection Timeout=6;",
+            //     ip, port, serviceName, userId, password);
+            ////if (cb_sysdba.Checked)
+            ////{
+            ////    connstr += "DBA Privilege=SYSDBA;";
+            ////}
+            //orcl = new OracleHelper(connstr);
             StringBuilder res = new StringBuilder();
             failCount = 0;
 
@@ -66,44 +66,44 @@ namespace SfxOracle
             res.AppendLine(GetDbVersion());
             res.AppendLine("==================================================================");
             res.AppendLine("0.参数：");
-            if (IsArchive())
-            {
-                res.AppendLine("归档模式：开启");
-            }
-            else
-            {
-                res.AppendLine("归档模式：没有开启");
-                failCount += 1;
-            }
-            if (isTraceOn())
-            {
+            //if (IsArchive())
+            //{
+            //    res.AppendLine("归档模式：开启");
+            //}
+            //else
+            //{
+            //    res.AppendLine("归档模式：没有开启");
+            //    failCount += 1;
+            //}
+            //if (isTraceOn())
+            //{
 
-                res.AppendLine("监听日志跟踪：开启（判定依据为跟踪日志有今天的数据）");
-                failCount += 1;
-            }
-            else
-            {
-                res.AppendLine("监听日志跟踪：关闭 （判定依据为跟踪日志有今天的数据）");
-            }
-            res.AppendLine(GetNls());
-            res.AppendLine("==================================================================");
-            res.AppendLine("==================================================================");
-            res.AppendLine("==================================================================");
-            res.AppendLine("==================================================================");
-            //1主要参数
-            res.AppendLine(queryParamter());
-            res.AppendLine("==================================================================");
-            //2RMAN参数
-            res.AppendLine(queryParamterRman());
-            res.AppendLine("==================================================================");
-            //3RMAN今天备份情况
-            res.AppendLine(queryParamterRmanStatus());
-            res.AppendLine("==================================================================");
-            //4 date file
-            res.AppendLine(queryRmanFile());
-            res.AppendLine("==================================================================");
-            res.AppendLine(queryDataFile());
-            res.AppendLine("==================================================================");
+            //    res.AppendLine("监听日志跟踪：开启（判定依据为跟踪日志有今天的数据）");
+            //    failCount += 1;
+            //}
+            //else
+            //{
+            //    res.AppendLine("监听日志跟踪：关闭 （判定依据为跟踪日志有今天的数据）");
+            //}
+            //res.AppendLine(GetNls());
+            //res.AppendLine("==================================================================");
+            //res.AppendLine("==================================================================");
+            //res.AppendLine("==================================================================");
+            //res.AppendLine("==================================================================");
+            ////1主要参数
+            //res.AppendLine(queryParamter());
+            //res.AppendLine("==================================================================");
+            ////2RMAN参数
+            //res.AppendLine(queryParamterRman());
+            //res.AppendLine("==================================================================");
+            ////3RMAN今天备份情况
+            //res.AppendLine(queryParamterRmanStatus());
+            //res.AppendLine("==================================================================");
+            ////4 date file
+            //res.AppendLine(queryRmanFile());
+            //res.AppendLine("==================================================================");
+            //res.AppendLine(queryDataFile());
+            //res.AppendLine("==================================================================");
             if (failCount > 0)
             {
                 res.AppendLine("SFXERROR:" + failCount);

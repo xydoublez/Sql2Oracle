@@ -172,7 +172,7 @@ namespace SfxOracle
                 
 
             }
-            ThreadPool.SetMaxThreads(1, 1);
+            ThreadPool.SetMaxThreads(2, 2);
             ThreadPool.SetMinThreads(1, 1);
             foreach (var item in list)
             {
@@ -186,9 +186,10 @@ namespace SfxOracle
         private void verify2(Object info)
         {
             DataInfo item = (DataInfo)info;
-            var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;Connection Timeout=6;",
+            var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};",
              item.ip, "1521", item.serviceName, item.userId, item.password);
             db d = new db(connstr);
+            counter2.Incre();
             try
             {
              
@@ -201,7 +202,7 @@ namespace SfxOracle
                 item.result = "SFXERROR:连接失败";
                 AddBatchLog(item.result);
             }
-            counter2.Incre();
+            
             DataRow row = dt.NewRow();
             row["医院名称"] = item.hospitalname;
             row["服务器"] = item.module;
@@ -209,7 +210,7 @@ namespace SfxOracle
             row["服务名"] = item.serviceName;
             row["验证内容"] = item.result;
             row["是否验证通过"] = item.result.IndexOf("SFXERROR:") > -1 ? "否" : "是";
-            row["数据库版本"] = d.GetVersion();
+            //row["数据库版本"] = d.GetVersion();
             dt.Rows.Add(row);
             
             this.BeginInvoke(new Action(() => {

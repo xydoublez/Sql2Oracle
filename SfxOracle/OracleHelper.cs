@@ -281,14 +281,16 @@ namespace SfxOracle
 		/// <returns>DataSet</returns>
 		public  DataSet Query(string SQLString)
 		{
-			using (OracleConnection connection = new OracleConnection(connectionString))
+            
+            using (OracleConnection connection = new OracleConnection(connectionString))
 			{
 				DataSet ds = new DataSet();
 				try
 				{
+                    OracleConnection.ClearAllPools();
+                    connection.Open();
                     
-					connection.Open();
-					OracleDataAdapter command = new OracleDataAdapter(SQLString,connection);	
+                    OracleDataAdapter command = new OracleDataAdapter(SQLString,connection);	
 					command.Fill(ds,"ds");
 				}
 				catch(OracleException ex)
