@@ -47,6 +47,7 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.rbResult = new System.Windows.Forms.RichTextBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.rbBatchResult = new System.Windows.Forms.RichTextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.lblxlsInfo = new System.Windows.Forms.Label();
@@ -54,7 +55,7 @@
             this.button3 = new System.Windows.Forms.Button();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.rbBatchResult = new System.Windows.Forms.RichTextBox();
+            this.cb_sysdba = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -204,6 +205,7 @@
             // 
             // sqlText
             // 
+            //this.sqlText.FoldingStrategy = null;
             this.sqlText.Font = new System.Drawing.Font("Courier New", 10F);
             this.sqlText.Location = new System.Drawing.Point(19, 6);
             this.sqlText.Name = "sqlText";
@@ -248,6 +250,14 @@
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "批量验证结果";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // rbBatchResult
+            // 
+            this.rbBatchResult.Location = new System.Drawing.Point(922, 64);
+            this.rbBatchResult.Name = "rbBatchResult";
+            this.rbBatchResult.Size = new System.Drawing.Size(168, 376);
+            this.rbBatchResult.TabIndex = 28;
+            this.rbBatchResult.Text = "";
             // 
             // button2
             // 
@@ -304,19 +314,24 @@
             this.openFileDialog1.FileName = "openFileDialog1";
             this.openFileDialog1.Filter = "EXCEL文件|*.xls;*.xlsx";
             // 
-            // rbBatchResult
+            // cb_sysdba
             // 
-            this.rbBatchResult.Location = new System.Drawing.Point(922, 64);
-            this.rbBatchResult.Name = "rbBatchResult";
-            this.rbBatchResult.Size = new System.Drawing.Size(168, 376);
-            this.rbBatchResult.TabIndex = 28;
-            this.rbBatchResult.Text = "";
+            this.cb_sysdba.AutoSize = true;
+            this.cb_sysdba.ForeColor = System.Drawing.Color.Blue;
+            this.cb_sysdba.Location = new System.Drawing.Point(643, 38);
+            this.cb_sysdba.Name = "cb_sysdba";
+            this.cb_sysdba.Size = new System.Drawing.Size(78, 16);
+            this.cb_sysdba.TabIndex = 29;
+            this.cb_sysdba.Text = "AS SYSDBA";
+            this.cb_sysdba.UseVisualStyleBackColor = true;
+            this.cb_sysdba.CheckedChanged += new System.EventHandler(this.cb_sysdba_CheckedChanged);
             // 
             // QueryForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1281, 580);
+            this.Controls.Add(this.cb_sysdba);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.验证);
             this.Controls.Add(this.tabControl1);
@@ -333,7 +348,7 @@
             this.Controls.Add(this.button1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "QueryForm";
-            this.Text = "oracle规范验证辅助工具";
+            this.Text = "oracle规范验证辅助工具-20180925";
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
@@ -373,5 +388,6 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.DataGridView dataGridView2;
         private System.Windows.Forms.RichTextBox rbBatchResult;
+        private System.Windows.Forms.CheckBox cb_sysdba;
     }
 }

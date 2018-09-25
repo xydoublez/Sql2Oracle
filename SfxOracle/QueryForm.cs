@@ -29,11 +29,18 @@ namespace SfxOracle
             try
             {
 
-                orcl = new OracleHelper(string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;",
-                    txtIp.Text, txtPort.Text, txtServiceName.Text, txtUserId.Text, txtPassword.Text));
+                var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;Connection Timeout=6;",
+                    txtIp.Text, txtPort.Text, txtServiceName.Text, txtUserId.Text, txtPassword.Text);
+                if (cb_sysdba.Checked)
+                {
+                    connstr += "DBA Privilege=SYSDBA;";
+                }
+                orcl = new OracleHelper(connstr);
                 DataSet ds = orcl.Query(this.sqlText.Text);
                 this.dataGridView1.DataSource = ds.Tables[0];
                 this.dataGridView1.Refresh();
+                
+
             }
             catch (Exception ex)
             {
@@ -66,13 +73,19 @@ namespace SfxOracle
         int failCount = 0;
         private string GetVerifyInfo(string ip,string port,string serviceName,string userId,string password,string hospitalName,string module="")
         {
-            
-                orcl = new OracleHelper(string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;",
-                 ip,port,serviceName,userId,password));
+            var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;Connection Timeout=6;",
+                 ip, port, serviceName, userId, password);
+            if (cb_sysdba.Checked)
+            {
+                connstr += "DBA Privilege=SYSDBA;";
+            }
+            orcl = new OracleHelper(connstr);
                 StringBuilder res = new StringBuilder();
                 failCount = 0;
 
                 //0验证是否归档模式
+                res.AppendLine("==================================================================");
+                res.AppendLine(GetDbVersion());
                 res.AppendLine("==================================================================");
                 res.AppendLine("0.参数：");
                 if (IsArchive())
@@ -318,7 +331,7 @@ ORDER BY
                 return suc;
             }catch(Exception ex)
             {
-                MessageBox.Show(ex.Message + ex.StackTrace);
+                
                 return true;
             }
         }
@@ -376,6 +389,7 @@ ORDER BY
             dt.Columns.Add(new DataColumn("服务名"));
             dt.Columns.Add(new DataColumn("验证内容"));
             dt.Columns.Add(new DataColumn("是否验证通过"));
+            dt.Columns.Add(new DataColumn("数据库版本"));
             foreach (DataRow item in table.Rows)
             {
                 i++;
@@ -396,9 +410,10 @@ ORDER BY
                     result = GetVerifyInfo(ip, "1521", serviceName, userId, password, hospitalName);
                     AddBatchLog(hospitalName + "-" + module + "验证完成");
                 }
-                catch(Exception ex)
+                catch
                 {
-                    result = "SFXERROR:"+ ex.Message + ex.StackTrace;
+                    result = "SFXERROR:连接失败";
+                    
                     AddBatchLog(result);
                 }
                 DataRow row = dt.NewRow();
@@ -408,6 +423,7 @@ ORDER BY
                 row["服务名"] = serviceName;
                 row["验证内容"] = result;
                 row["是否验证通过"] = result.IndexOf("SFXERROR:")>-1 ? "否" : "是";
+                row["数据库版本"] = GetVersion();
                 dt.Rows.Add(row);
 
             }
@@ -514,12 +530,52 @@ ORDER BY
         {  
             Application.DoEvents();
             this.rbBatchResult.BeginInvoke(new Action(() => {
-                var info = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "\r\n";
+                var info = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\r\n";
                 info += msg + "\r\n";
                 this.rbBatchResult.AppendText(info);
                 File.AppendAllText("log.txt", info);
                 this.rbBatchResult.ScrollToCaret();
             }));
+        }
+        private string GetDbVersion()
+        {
+          
+                DataSet ds = orcl.Query(@"select product,version,status from product_component_version");
+                var dt = ds.Tables[0];
+                var result = "00.数据库版本信息：\r\n";
+                foreach (DataRow row in dt.Rows)
+                {
+                    result += "产品：" + row["product"].ToString() + "\r\n";
+                    result += "版本号：" + row["version"].ToString() + "\r\n";
+                    result += "状态：" + row["status"].ToString() + "\r\n";
+                }
+                return result;
+           
+        }
+        private string GetVersion()
+        {
+            try
+            {
+                DataSet ds = orcl.Query(@"select version from product_component_version where rownum=1");
+                var dt = ds.Tables[0];
+                var result = "";
+                foreach (DataRow row in dt.Rows)
+                {
+                    result += row["version"].ToString();
+
+                }
+                return result;
+            }
+            catch
+            {
+                return "";
+            }
+
+        }
+
+        private void cb_sysdba_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 
