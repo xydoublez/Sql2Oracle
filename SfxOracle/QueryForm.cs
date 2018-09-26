@@ -24,20 +24,59 @@ namespace SfxOracle
         {
             query();
         }
+        private void query2()
+        {
+            try
+            {
+
+                var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;Connection Timeout=60;",
+                    txtIp.Text, txtPort.Text, txtServiceName.Text, txtUserId.Text, txtPassword.Text);
+                //Oracle.DataAccess.Client.OracleConnectionStringBuilder connectionStringBuilder = new Oracle.DataAccess.Client.OracleConnectionStringBuilder();
+                //connectionStringBuilder.DataSource = this.txtIp.Text;
+                //connectionStringBuilder.UserID = this.txtUserId.Text;
+                //connectionStringBuilder.Password = this.txtPassword.Text;
+                //var connstr = connectionStringBuilder.ToString();
+                if (cb_sysdba.Checked)
+                {
+                    connstr += "DBA Privilege=SYSDBA;";
+                }
+                using (Oracle.DataAccess.Client.OracleConnection conn = new Oracle.DataAccess.Client.OracleConnection(connstr))
+                {
+
+                    DataSet ds = new DataSet();
+                    Oracle.DataAccess.Client.OracleDataAdapter oracleDataAdapter = new Oracle.DataAccess.Client.OracleDataAdapter(this.sqlText.Text, conn);
+                    oracleDataAdapter.Fill(ds);
+                    this.dataGridView1.DataSource = ds.Tables[0];
+                    this.dataGridView1.Refresh();
+                }
+                   
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.StackTrace);
+            }
+        }
         OracleHelper orcl;
         private void query()
         {
             try
             {
 
-                var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;Connection Timeout=6;",
+                var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;Connection Timeout=60;",
                     txtIp.Text, txtPort.Text, txtServiceName.Text, txtUserId.Text, txtPassword.Text);
                 if (cb_sysdba.Checked)
                 {
                     connstr += "DBA Privilege=SYSDBA;";
                 }
-                orcl = new OracleHelper(connstr);
-                DataSet ds = orcl.Query(this.sqlText.Text);
+                int type = 0;
+                if (cb_client.Checked)
+                {
+                    type = 1;
+                }
+                db d = new db(connstr, type);
+                DataSet ds = d.Query(this.sqlText.Text);
                 this.dataGridView1.DataSource = ds.Tables[0];
                 this.dataGridView1.Refresh();
                 
@@ -65,7 +104,12 @@ namespace SfxOracle
             {
                 var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;Connection Timeout=6;",
                  txtIp.Text, txtPort.Text, txtServiceName.Text, txtUserId.Text, txtPassword.Text);
-                db d = new db(connstr);
+                int type = 0;
+                if (cb_client.Checked)
+                {
+                    type = 1;
+                }
+                db d = new db(connstr, type);
                 this.rbResult.Text = d.GetVerifyInfo(txtIp.Text, txtPort.Text, txtServiceName.Text, txtUserId.Text, txtPassword.Text, "");
                 this.tabControl1.SelectedIndex = 1;
             }catch(Exception ex)
@@ -172,8 +216,8 @@ namespace SfxOracle
                 
 
             }
-            ThreadPool.SetMaxThreads(2, 2);
-            ThreadPool.SetMinThreads(1, 1);
+            ThreadPool.SetMaxThreads(4, 4);
+            ThreadPool.SetMinThreads(2, 2);
             foreach (var item in list)
             {
                 ThreadPool.QueueUserWorkItem(new WaitCallback(verify2), item);
@@ -186,10 +230,17 @@ namespace SfxOracle
         private void verify2(Object info)
         {
             DataInfo item = (DataInfo)info;
-            var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};",
+            var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Min Pool Size=1;Max Pool Size=100;Pooling=true;Connection Timeout=6;Enlist=false;",
              item.ip, "1521", item.serviceName, item.userId, item.password);
-            db d = new db(connstr);
-            counter2.Incre();
+            int type = 0;
+            if (cb_client.Checked)
+            {
+                type = 1;
+            }
+            db d = new db(connstr, type);
+            //counter2.Incre();
+            //AddBatchLog("第"+counter2.Val.ToString());
+
             try
             {
              
@@ -210,20 +261,24 @@ namespace SfxOracle
             row["服务名"] = item.serviceName;
             row["验证内容"] = item.result;
             row["是否验证通过"] = item.result.IndexOf("SFXERROR:") > -1 ? "否" : "是";
-            //row["数据库版本"] = d.GetVersion();
+            row["数据库版本"] = d.GetVersion();
             dt.Rows.Add(row);
-            
+              counter2.Incre();
+            AddBatchLog("第"+counter2.Val.ToString());
             this.BeginInvoke(new Action(() => {
                 this.dataGridView2.DataSource = dt;
                 this.dataGridView2.Refresh();
-                if (counter2.Val == counter)
-                {
-                    MessageBox.Show("验证完毕");
-                    AddBatchLog("验证完毕");
-                }
+              
 
             }));
-          
+
+            
+            if (counter2.Val == counter)
+            {
+                MessageBox.Show("验证完毕");
+                AddBatchLog("验证完毕");
+            }
+
 
         }
         private class DataInfo
@@ -382,6 +437,11 @@ namespace SfxOracle
             {
                 return Interlocked.Decrement(ref _val);
             }
+        }
+
+        private void QueryForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 

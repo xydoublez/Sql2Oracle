@@ -56,6 +56,7 @@
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.cb_sysdba = new System.Windows.Forms.CheckBox();
+            this.cb_client = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -205,7 +206,7 @@
             // 
             // sqlText
             // 
-            //this.sqlText.FoldingStrategy = null;
+           // this.sqlText.FoldingStrategy = null;
             this.sqlText.Font = new System.Drawing.Font("Courier New", 10F);
             this.sqlText.Location = new System.Drawing.Point(19, 6);
             this.sqlText.Name = "sqlText";
@@ -318,7 +319,7 @@
             // 
             this.cb_sysdba.AutoSize = true;
             this.cb_sysdba.ForeColor = System.Drawing.Color.Blue;
-            this.cb_sysdba.Location = new System.Drawing.Point(643, 38);
+            this.cb_sysdba.Location = new System.Drawing.Point(616, 51);
             this.cb_sysdba.Name = "cb_sysdba";
             this.cb_sysdba.Size = new System.Drawing.Size(78, 16);
             this.cb_sysdba.TabIndex = 29;
@@ -326,11 +327,23 @@
             this.cb_sysdba.UseVisualStyleBackColor = true;
             this.cb_sysdba.CheckedChanged += new System.EventHandler(this.cb_sysdba_CheckedChanged);
             // 
+            // cb_client
+            // 
+            this.cb_client.AutoSize = true;
+            this.cb_client.ForeColor = System.Drawing.Color.Blue;
+            this.cb_client.Location = new System.Drawing.Point(764, 51);
+            this.cb_client.Name = "cb_client";
+            this.cb_client.Size = new System.Drawing.Size(132, 16);
+            this.cb_client.TabIndex = 30;
+            this.cb_client.Text = "用oracle客户端驱动";
+            this.cb_client.UseVisualStyleBackColor = true;
+            // 
             // QueryForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1281, 580);
+            this.Controls.Add(this.cb_client);
             this.Controls.Add(this.cb_sysdba);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.验证);
@@ -349,6 +362,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "QueryForm";
             this.Text = "oracle规范验证辅助工具-20180925";
+            this.Load += new System.EventHandler(this.QueryForm_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
@@ -389,5 +403,6 @@
         private System.Windows.Forms.DataGridView dataGridView2;
         private System.Windows.Forms.RichTextBox rbBatchResult;
         private System.Windows.Forms.CheckBox cb_sysdba;
+        private System.Windows.Forms.CheckBox cb_client;
     }
 }

@@ -6,18 +6,19 @@ using System.Data;
 using System.Configuration;
 using System.Data.Common;
 using System.Collections.Generic;
-//引用Oracle odp.net 纯托管类，不依赖于oracle客户端
-using Oracle.ManagedDataAccess.Client;
+//引用依赖于oracle客户端
+using Oracle.DataAccess.Client;
 using System.Text;
-using Oracle.ManagedDataAccess.Types;
+using Oracle.DataAccess.Types;
+
 namespace SfxOracle
 {
-	/// <summary>
+    /// <summary>
     /// 数据访问基础类(基于Oracle) 
-    /// 引用Oracle odp.net 纯托管类，不依赖于oracle客户端
-	/// </summary>
-	public class OracleHelper:IDbHelper
-	{
+    /// 依赖于oracle客户端
+    /// </summary>
+    public class OracleHelper2: IDbHelper
+    {
         //数据库连接字符串(web.config来配置)，可以动态更改connectionString支持多数据库.		
         private string _connectionString = "";
         /// <summary>
@@ -34,7 +35,7 @@ namespace SfxOracle
             set { _connectionString = value; }
         }
 
-        public OracleHelper(string connectionString)
+        public OracleHelper2(string connectionString)
             
 		{
             this.connectionString = connectionString;
