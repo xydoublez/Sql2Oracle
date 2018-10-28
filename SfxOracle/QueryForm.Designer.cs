@@ -206,7 +206,7 @@
             // 
             // sqlText
             // 
-           // this.sqlText.FoldingStrategy = null;
+            //this.sqlText.FoldingStrategy = null;
             this.sqlText.Font = new System.Drawing.Font("Courier New", 10F);
             this.sqlText.Location = new System.Drawing.Point(19, 6);
             this.sqlText.Name = "sqlText";
@@ -278,6 +278,7 @@
             this.dataGridView2.RowTemplate.Height = 23;
             this.dataGridView2.Size = new System.Drawing.Size(824, 416);
             this.dataGridView2.TabIndex = 1;
+            this.dataGridView2.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView2_CellMouseDoubleClick);
             // 
             // lblxlsInfo
             // 
@@ -361,7 +362,7 @@
             this.Controls.Add(this.button1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "QueryForm";
-            this.Text = "oracle规范验证辅助工具-20180925";
+            this.Text = "oracle规范验证辅助工具-20181028";
             this.Load += new System.EventHandler(this.QueryForm_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);

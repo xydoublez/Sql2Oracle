@@ -443,6 +443,12 @@ namespace SfxOracle
         {
 
         }
+
+        private void dataGridView2_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            ViewText f = new ViewText(dataGridView2.CurrentRow.Cells[e.ColumnIndex].Value.ToString());
+            f.ShowDialog();
+        }
     }
 
 }

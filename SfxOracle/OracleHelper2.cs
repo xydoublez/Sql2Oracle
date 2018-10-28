@@ -296,8 +296,8 @@ namespace SfxOracle
 				}
 				catch(OracleException ex)
 				{
-                    
-					throw new Exception(ex.Message);
+
+                    throw ex;
 				}			
 				return ds;
 			}			

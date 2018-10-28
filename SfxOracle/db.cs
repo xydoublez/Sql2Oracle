@@ -284,8 +284,10 @@ ORDER BY
             {
                 //0创建表
                 string traceDir = getBase() + "\\diag\\tnslsnr\\" + getHostName() + "\\listener\\trace";
-                orcl.ExecuteSql(@"BEGIN
-
+                orcl.ExecuteSql(@"declare v_cnt Number;
+                BEGIN
+  select count(*) into v_cnt from user_tables where table_name ='SFXDIRTRACE';
+ if v_cnt=0 then
     EXECUTE IMMEDIATE 'create or replace directory sfxdirtrace as ''" + traceDir + @"''' ;
             EXECUTE IMMEDIATE 'create  table sfxdirtrace
            (log varchar2(2000))
@@ -298,7 +300,7 @@ ORDER BY
  location(''listener.log''))
  reject limit unlimited
 ' ; 
-
+end if;
     END; ");
                 //1查询数据
 
