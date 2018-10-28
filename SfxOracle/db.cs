@@ -113,6 +113,7 @@ namespace SfxOracle
             res.AppendLine("==================================================================");
             if (failCount > 0)
             {
+                res.AppendLine("验证未通过！！！");
                 res.AppendLine("SFXERROR:" + failCount);
             }
             return res.ToString();
