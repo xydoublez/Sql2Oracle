@@ -362,7 +362,7 @@
             this.Controls.Add(this.button1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "QueryForm";
-            this.Text = "oracle规范验证辅助工具-20181028";
+            this.Text = "oracle规范验证辅助工具-2018-11-19";
             this.Load += new System.EventHandler(this.QueryForm_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);

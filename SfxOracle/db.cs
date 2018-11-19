@@ -10,6 +10,7 @@ namespace SfxOracle
     {
         IDbHelper orcl;
         int failCount = 0;
+        StringBuilder failMsg = new StringBuilder();
         public  db(string connstr,int type=0)
         {
             if (type == 1)
@@ -80,12 +81,14 @@ namespace SfxOracle
             else
             {
                 res.AppendLine("归档模式：没有开启");
+                failMsg.AppendLine("归档模式：没有开启,请查看规范");
                 failCount += 1;
             }
             if (isTraceOn())
             {
 
                 res.AppendLine("监听日志跟踪：开启（判定依据为跟踪日志有今天的数据）");
+                failMsg.AppendLine("监听日志跟踪没有关闭,请查看规范");
                 failCount += 1;
             }
             else
@@ -115,7 +118,26 @@ namespace SfxOracle
             {
                 res.AppendLine("验证未通过！！！");
                 res.AppendLine("SFXERROR:" + failCount);
+                res.AppendLine("验证未通过具体项目如下：");
+                res.AppendLine(failMsg.ToString());
+                
             }
+            else
+            {
+                res.AppendLine("验证通过！！！");
+            }
+            return res.ToString();
+
+
+
+        }
+        public string GetVerifyInfo3(string ip, string port, string serviceName, string userId, string password, string hospitalName, string module = "")
+        {
+   
+            StringBuilder res = new StringBuilder();
+            failCount = 0;
+            res.Append(ip).Append(":").Append(userId).Append(":").Append(password).Append(":").Append(serviceName).AppendLine("");
+            GetDbVersion();
             return res.ToString();
 
 
@@ -165,6 +187,7 @@ where name in ('processes','sga_max_size','spfile','memory_target','memory_max_t
             if (dt.Rows.Count == 0)
             {
                 failCount += 1;
+                failMsg.AppendLine("RMAN配置参数没有配置，请查看规范");
             }
             foreach (DataRow row in dt.Rows)
             {
@@ -262,6 +285,7 @@ ORDER BY
             if (dt.Rows.Count == 0)
             {
                 failCount += 1;
+                failMsg.AppendLine("RMAN备份作业没有，请查看规范");
             }
             var result = "4.RMAN一周内备份集相关信息：\r\n";
             foreach (DataRow row in dt.Rows)

@@ -104,6 +104,10 @@ namespace SfxOracle
             {
                 var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Max Pool Size=512;Pooling=true;Connection Timeout=6;",
                  txtIp.Text, txtPort.Text, txtServiceName.Text, txtUserId.Text, txtPassword.Text);
+                if (cb_sysdba.Checked)
+                {
+                    connstr += "DBA Privilege=SYSDBA;";
+                }
                 int type = 0;
                 if (cb_client.Checked)
                 {
@@ -216,8 +220,8 @@ namespace SfxOracle
                 
 
             }
-            ThreadPool.SetMaxThreads(4, 4);
-            ThreadPool.SetMinThreads(2, 2);
+            ThreadPool.SetMaxThreads(64, 64);
+            ThreadPool.SetMinThreads(8, 8);
             foreach (var item in list)
             {
                 ThreadPool.QueueUserWorkItem(new WaitCallback(verify2), item);
@@ -229,9 +233,14 @@ namespace SfxOracle
         }
         private void verify2(Object info)
         {
+            Application.DoEvents();
             DataInfo item = (DataInfo)info;
             var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Min Pool Size=1;Max Pool Size=100;Pooling=true;Connection Timeout=6;Enlist=false;",
              item.ip, "1521", item.serviceName, item.userId, item.password);
+            if (cb_sysdba.Checked)
+            {
+                connstr += "DBA Privilege=SYSDBA;";
+            }
             int type = 0;
             if (cb_client.Checked)
             {
@@ -273,6 +282,63 @@ namespace SfxOracle
             }));
 
             
+            if (counter2.Val == counter)
+            {
+                MessageBox.Show("验证完毕");
+                AddBatchLog("验证完毕");
+            }
+
+
+        }
+
+        //验证信息正确
+        private void verify3(Object info)
+        {
+            Application.DoEvents();
+            DataInfo item = (DataInfo)info;
+            var connstr = string.Format("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVER=DEDICATED)(Service_Name={2})));User Id={3};Password={4};Min Pool Size=1;Max Pool Size=100;Pooling=true;Connection Timeout=6;Enlist=false;",
+             item.ip, "1521", item.serviceName, item.userId, item.password);
+            int type = 0;
+            if (cb_client.Checked)
+            {
+                type = 1;
+            }
+            db d = new db(connstr, type);
+            //counter2.Incre();
+            //AddBatchLog("第"+counter2.Val.ToString());
+
+            try
+            {
+
+                item.result = d.GetVerifyInfo3(item.ip, "1521", item.serviceName, item.userId, item.password, item.hospitalname, item.module);
+                AddBatchLog(item.hospitalname + "-" + item.module + "验证完成");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine(ex.Message);
+                item.result = "SFXERROR:连接失败";
+                AddBatchLog(item.result);
+            }
+
+            DataRow row = dt.NewRow();
+            row["医院名称"] = item.hospitalname;
+            row["服务器"] = item.module;
+            row["IP"] = item.ip;
+            row["服务名"] = item.serviceName;
+            row["验证内容"] = item.result;
+            row["是否验证通过"] = item.result.IndexOf("SFXERROR:") > -1 ? "否" : "是";
+            row["数据库版本"] = "";
+            dt.Rows.Add(row);
+            counter2.Incre();
+            AddBatchLog("第" + counter2.Val.ToString());
+            this.BeginInvoke(new Action(() => {
+                this.dataGridView2.DataSource = dt;
+                this.dataGridView2.Refresh();
+
+
+            }));
+
+
             if (counter2.Val == counter)
             {
                 MessageBox.Show("验证完毕");
@@ -443,6 +509,19 @@ namespace SfxOracle
         {
 
         }
+        public static void AppendTextColorful(RichTextBox rtBox, string text, Color color, bool addNewLine)
+        {
+            if (addNewLine)
+            {
+                text += Environment.NewLine;
+            }
+            rtBox.SelectionStart = rtBox.TextLength;
+            rtBox.SelectionLength = 0;
+            rtBox.SelectionColor = color;
+            rtBox.AppendText(text);
+            rtBox.SelectionColor = rtBox.ForeColor;
+        }
+
 
         private void dataGridView2_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
